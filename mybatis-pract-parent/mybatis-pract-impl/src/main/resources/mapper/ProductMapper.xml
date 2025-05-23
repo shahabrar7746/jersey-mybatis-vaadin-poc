@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.pract.mybatis.api.impl.mapper.ProductMapper">
+
+
+    <resultMap id="productResultMap" type="org.pract.mybatis.api.impl.models.ProductModel">
+        <id property="id" column="id"/>
+        <result property="name" column="product_name"/>
+        <result  property="seller" column="seller_id"/>
+    </resultMap>
+
+    <select id="findAll" parameterType="org.pract.mybatis.api.filters.ProductFilter" resultMap="productResultMap">
+        SELECT product.id, product.product_name
+        <if test="join">
+            , product.seller_id
+        </if>
+        FROM product
+        <if test="join">
+            INNER JOIN seller ON product.seller_id = seller.id
+        </if>
+
+        <where>
+            <if test="ids != null and !ids.isEmpty()">
+                product.id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+
+            <if test="productNames != null and !productNames.isEmpty()">
+                <foreach collection="productNames" item="name" open="OR (" separator=" OR " close=")">
+                    product.product_name LIKE CONCAT('%', #{name}, '%')
+                </foreach>
+            </if>
+
+            <if test="sellerNames != null and !sellerNames.isEmpty() and join">
+                <foreach collection="sellerNames" item="name" open="OR (" separator=" OR " close=")">
+                    seller.name LIKE CONCAT('%', #{name}, '%')
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

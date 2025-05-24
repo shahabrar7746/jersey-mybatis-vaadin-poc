@@ -1,5 +1,6 @@
 package org.pract.mybatis.api.impl.serviceimpl;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.pract.mybatis.api.dto.ProductDto;
 import org.pract.mybatis.api.dto.SellerDto;
@@ -7,6 +8,7 @@ import org.pract.mybatis.api.filters.ProductFilter;
 import org.pract.mybatis.api.impl.mapper.ProductMapper;
 import org.pract.mybatis.api.impl.mapper.SellerMapper;
 import org.pract.mybatis.api.impl.models.ProductModel;
+import org.pract.mybatis.api.impl.repository.ProductModificationRepository;
 import org.pract.mybatis.api.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,34 +24,38 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductMapper mapper;
 
-    @Autowired
-    public ProductServiceImpl(ProductMapper mapper, SellerMapper sellerMapper) {
-        this.mapper = mapper;
-        this.sellerMapper = sellerMapper;
-    }
+    private final ProductModificationRepository modifyRepo;
 
     private final SellerMapper sellerMapper;
 
-    @Override
-    public List<ProductDto> findAll(ProductFilter filter) {
-        List<ProductModel> models = null;
-        models = mapper.findAll(filter);
-        List<Integer> sellerIds = models.stream()
-                .map(ProductModel::getSeller).collect(Collectors.toList());
-        return convertToProductDto(models, sellerIds);
+    public ProductServiceImpl(ProductMapper mapper, ProductModificationRepository modifyRepo, SellerMapper sellerMapper) {
+        this.mapper = mapper;
+        this.modifyRepo = modifyRepo;
+        this.sellerMapper = sellerMapper;
     }
 
-    private List<ProductDto> convertToProductDto(List<ProductModel> models, List<Integer> sellerId) {
-        return models
-                .stream()
-                .map(productModel -> {
-                    ProductDto dto = new ProductDto();
-                    dto.setId(productModel.getId());
-                    dto.setProductName(productModel.getName());
-                    final var sellerNameById = sellerMapper.toDto(sellerId.removeFirst());
-                    dto.setSeller(sellerNameById);
-                    return dto;
-                })
-                .collect(Collectors.toList());
+    @Override
+    public List<ProductDto> findAll(ProductFilter filter) {
+        return mapper.findAll(filter);
     }
+
+    @Override
+    public Boolean addProduct(ProductDto productDto) {
+        try {
+            ProductModel model = new ProductModel();
+            model.setSeller(sellerMapper.findByName(productDto.getSeller()));
+            model.setName(productDto.getProductName());
+            modifyRepo.save(model);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean remove(@NonNull Integer id) {
+        return modifyRepo.delete(id);
+    }
+
 }

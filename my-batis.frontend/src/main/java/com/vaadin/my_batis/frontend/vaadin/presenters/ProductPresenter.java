@@ -8,6 +8,7 @@ import org.pract.mybatis.api.service.ProductService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.management.Notification;
 import java.util.List;
 @Component
 @Scope("prototype")
@@ -30,5 +31,10 @@ public class ProductPresenter extends AbstractPresenter<ProductView> {
             filter.setJoin(true);
         }
        return service.findAll(filter);
+    }
+
+    public boolean deleteProduct(ProductDto dto)
+    {
+        return service.remove(dto.getId());
     }
 }

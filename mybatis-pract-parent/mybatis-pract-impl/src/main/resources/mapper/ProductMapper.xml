@@ -6,16 +6,16 @@
 <mapper namespace="org.pract.mybatis.api.impl.mapper.ProductMapper">
 
 
-    <resultMap id="productResultMap" type="org.pract.mybatis.api.impl.models.ProductModel">
+    <resultMap id="productResultMap" type="org.pract.mybatis.api.dto.ProductDto">
         <id property="id" column="id"/>
-        <result property="name" column="product_name"/>
-        <result  property="seller" column="seller_id"/>
+        <result property="productName" column="product_name"/>
+        <result  property="seller" column="name"/>
     </resultMap>
 
     <select id="findAll" parameterType="org.pract.mybatis.api.filters.ProductFilter" resultMap="productResultMap">
         SELECT product.id, product.product_name
         <if test="join">
-            , product.seller_id
+            , seller.name
         </if>
         FROM product
         <if test="join">

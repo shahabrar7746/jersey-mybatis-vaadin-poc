@@ -1,5 +1,6 @@
 package org.pract.mybatis.api.impl.models;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +12,45 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "product")
 public class ProductModel {
+
+    @Id
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
+
+    @Column(name = "product_name")
+    private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "seller_id")
+    private SellerModel seller;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public SellerModel getSeller() {
+        return seller;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSeller(SellerModel seller) {
+        this.seller = seller;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -26,30 +64,4 @@ public class ProductModel {
         return Objects.hashCode(id);
     }
 
-    private String name;
-    private Integer seller;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Integer getSeller() {
-        return seller;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setSeller(Integer seller) {
-        this.seller = seller;
-    }
 }

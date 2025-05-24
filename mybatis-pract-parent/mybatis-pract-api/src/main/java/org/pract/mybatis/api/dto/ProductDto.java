@@ -18,7 +18,8 @@ private Integer id;
 
     private String productName;
 
-private SellerDto seller;
+
+    private String seller;
 
     public String getProductName() {
         return productName;
@@ -28,11 +29,11 @@ private SellerDto seller;
         this.productName = productName;
     }
 
-    public SellerDto getSeller() {
+    public String getSeller() {
         return seller;
     }
 
-    public void setSeller(SellerDto seller) {
+    public void setSeller(String seller) {
         this.seller = seller;
     }
 }
